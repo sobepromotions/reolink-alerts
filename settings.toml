@@ -1,0 +1,95 @@
+# Reolink Alerts settings for THIS PC.
+# Lines starting with # are notes. After editing, restart the program
+# (tray icon > Quit, then start it again). Each PC keeps its own copy.
+# Start here: put your NVR's address under [nvr], then make the [[camera]]
+# sections at the bottom match your cameras. Then run  --check  (see README.md).
+
+[nvr]
+address = ""                # your NVR's IP address, like "192.168.0.50". Reserve it in your router so it never changes.
+user = "alerts"             # the NVR login made for this program (Administrator role); save its password with --set-password
+https = true                # log in over HTTPS (HTTPS must be on in the NVR's Server Settings)
+
+[night]
+# Night mode uses each camera's "night" list. 24-hour times; it can cross midnight.
+start = "22:00"
+end = "06:00"
+
+[popup]
+monitor = "primary"         # "primary", or a screen number from:  py reolink_alerts.py --monitors
+size = "Normal"             # the starting size; the tray menu > Pop-up size changes it (and remembers)
+sizes = { Normal = 40, Large = 60, "Extra large" = 80 }   # % of the screen width; height follows 16:9
+corner = "bottom-right"     # bottom-right, bottom-left, top-right or top-left
+margin = 24                 # pixels from the screen edges
+stream = "clear"            # "clear" (sharpest), "balanced" or "fluent" (lightest). Clear on 2 viewers at most.
+                            # The tray menu > Pop-up feed changes it (and remembers).
+fallback_to_sub = true      # if the feed won't play (NVR busy), step down by itself: Clear > Balanced > Fluent
+max_popups = 1              # one pop-up at a time
+linger_seconds = 15         # stay up this long after the event ends
+min_seconds = 10            # never close sooner than this
+max_seconds = 90            # always close after this long
+cooldown_seconds = 30       # after a max-time close, wait this long before another pop-up
+mute = true                 # no camera audio in pop-ups
+click_to_close = true       # left- or right-click a pop-up to close it
+wake_screen = true          # wake a sleeping monitor when a pop-up opens
+
+[sound]
+enabled = true
+volume = 100                # 100 = each file's own level, never boosted; lower turns them down
+repeat_seconds = 30         # don't repeat the same camera + type sound within this time
+clear_seconds = 120         # once per visit: the same camera + type sounds again only after that
+                            # camera has seen none of that type for this long (0 = off)
+offline = 'C:\Windows\Media\Windows Critical Stop.wav'   # when the NVR or a camera drops
+offline_at_night = false    # false = no offline sound during night hours
+
+[motion]
+# Plain motion alerts: any movement the camera itself reports, not just people,
+# animals or vehicles (so also shadows, rain, headlights and lightning).
+# Daytime only: a camera uses them when "motion" is in its day list.
+# The motion sound waits a moment and is skipped if a person, animal or vehicle
+# alert follows, so you never hear both for the same thing.
+enabled = false             # the starting value; tray menu > Motion alerts turns them on or off (and remembers)
+wait_seconds = 2            # how long to wait for a person/animal/vehicle before the motion sound
+
+[watchdog]
+camera_offline_checks = 2   # checks run once a minute
+nvr_offline_seconds = 120
+
+[snooze]
+choices = [15, 30, 60]      # minutes, shown in the tray menu
+hotkey = "ctrl+alt+s"       # snooze / resume from anywhere; "" turns it off
+hotkey_minutes = 30
+
+[program]
+mpv_path = ""               # empty = search (checks C:\Program Files\MPV Player and C:\mpv); or paste a full path
+tray = true
+
+# ---- Cameras -----------------------------------------------------------------
+# One [[camera]] section per camera to watch; cameras not listed are ignored.
+# name   = the camera's name on the NVR (spaces and capitals don't matter).
+#          --check lists every camera name on your NVR.
+# label  = what the pop-up and log call it
+# popup  = true: live pop-up + sound.  false: sound only.
+# day / night = alert types: person, animal, vehicle, package, motion
+#          (package needs a camera that detects packages, like a doorbell;
+#           motion only while motion alerts are on, see [motion])
+# sounds = one file per type (MP3, WAV or M4A). A path without a drive letter is taken
+#          from this folder, e.g. 'sound files\front yard person.mp3'.
+#          The sounds below work right away. To hear "Front yard, person" instead,
+#          see "Make your own alert sounds" in README.md.
+# sound  = false skips the sound for this camera on this PC
+
+[[camera]]
+name = "Front Yard"
+label = "Front Yard"
+popup = true                # live pop-up + sound
+day = ["person", "animal", "vehicle", "motion"]
+night = ["person"]
+sounds = { person = 'sound files\Westminster chime.mp3', animal = 'C:\Windows\Media\chimes.wav', vehicle = 'C:\Windows\Media\tada.wav', motion = 'C:\Windows\Media\Windows Ding.wav' }
+
+[[camera]]
+name = "Backyard"
+label = "Backyard"
+popup = false               # sound only
+day = ["person", "animal", "motion"]
+night = ["person"]
+sounds = { person = 'sound files\Westminster chime.mp3', animal = 'C:\Windows\Media\chimes.wav', motion = 'C:\Windows\Media\Windows Ding.wav' }
